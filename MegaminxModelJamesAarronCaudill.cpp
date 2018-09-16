@@ -1,11 +1,14 @@
-//Run This using g++ -std=c++11 MegaminxModelJamesAarronCaudill.cpp Megaminx
-// ./Megaminx
+//Run This using `g++ -std=c++11 MegaminxModelJamesAarronCaudill.cpp`
+//./a.out
 //Author: James Aarron Caudill
 //Due Date: September 4th, 2018
-
+//Github Link: https://github.com/JamesAarronCaudill/Project1ModelingTheMegaminx.git
+//Note: the GUI Code's creator is Adrian Wyllie. I haved tried to document
+//	every area in which the code was borrowed and or modified.
 
 #include <iostream>
 #include <string>
+#include <cmath>
 #include <sstream>
 
 using namespace std;
@@ -22,7 +25,7 @@ int changeSide();
 
 /*
 This struct is going to hold a single side of the Megaminx, there will be 12 objects of this structure.
-Each of the objects will represent one color on the megaminx
+Each of the objects will represent one face on the megaminx
 The Colors will always stay the same are not to be changed, this will be used in the main function to help change colors, and one of the movements.
 White will be the main face. The bottom of white will be the adjacent side of blue.
 The bottom of Blue, Yellow, Purple, Green, Red are relative to white, with the bottom of white relative to blue.
@@ -47,33 +50,21 @@ struct megaminx {
 	int top;
 } white, blue, yellow, purple, green, red, grey, lBlue, orange, lGreen, pink, lYellow;
 
-//White will be the main face. The bottom of white will be the adjacent side of blue.
-//The bottom of Blue, Yellow, Purple, Green, Red are relative to white, with the bottom of white relative to blue.
-// The bottom of lBlue, orange, lgreen, pink, lyellow are relative to grey with the bottom of grey relative to light blue
 
-
-
-//The method of rotation will be chosing a face color, and there will be 12 options
-// Front Face Clock Wise / Counter Clock Wise
-// Bottom Clock Wise / Counter Clock Wise
-// Right Clock Wise / Counter Clock Wise
-// Left Clock Wise / Counter Clock Wise
-// Top Right CLock Wise / Counter Clock Wise
-// Top Left Clock Wise / Counter Clock Wise
-
-
+int numberOutOfPlace(megaminx solvedWhite, megaminx solvedBlue, megaminx solvedYellow, megaminx solvedPurple, megaminx solvedGreen, megaminx solvedRed, megaminx solvedGrey, megaminx solvedLBlue, megaminx solvedLYellow, megaminx solvedPink, megaminx solvedLGreen, megaminx solvedOrange);
 // The way I will handle this is there will be 2 functions for movement, and 1 for changing faces.
 // Ex.
 // Top Left Clock Wise turn when current face is white. I will then switch to the green face with
 // 	the bottom relative to white, and then call the clock wise function to rotate clock wise so
 //	using a modified version of Adrias printing function I can keep track of all of the pieces and
 //	adjust my container as necessary. Then I will change back to the face that I originally called the move on.
+//  currently the change face function is not merged in as it is not necessary for this implementation.
 
 
 
 
 
-
+//NOTE: THIS GUI HAS BEEN ADOPTED AND MODIFIED FROM ADRIAN WYLLIE.
 //  Example output:
 //       3   2   2
 //         3   2
@@ -108,6 +99,9 @@ void baseMegaminx() {
 
 }
 
+
+//This is a pretty messy form of the clockwise function. I am almost sure there is a way to elemenate code.
+//However the best method I had found to do this is the hard code the changes.
 void clockWise(int color) {
 	megaminx colorName;
 	switch(color) {
@@ -176,17 +170,17 @@ void clockWise(int color) {
 						white.bottomMiddle = copyRed.bottomLeftMiddle;
 						white.bottomRight = copyRed.bottomLeft;
 						yellow.bottomRight = copyWhite.bottomLeft;
-						yellow.topRightMiddle = copyWhite.bottomMiddle;
+						yellow.bottomRightMiddle = copyWhite.bottomMiddle;
 						yellow.topRight = copyWhite.bottomRight;
 						lGreen.top = copyYellow.bottomRight;
 						lGreen.topLeftMiddle = copyYellow.bottomRightMiddle;
-						lGreen.topLeft = copyYellow.topLeft;
+						lGreen.topLeft = copyYellow.topRight;
 						pink.topRight = copyLGreen.top;
 						pink.topRightMiddle = copyLGreen.topLeftMiddle;
 						pink.top = copyLGreen.topLeft;
-						red.bottomLeft = copyPink.bottomLeft;
+						red.bottomLeft = copyPink.top;
 						red.bottomLeftMiddle = copyPink.topRightMiddle;
-						red.topLeft = copyPink.top;
+						red.topLeft = copyPink.topRight;
 						break;
 					//Yellow will be Represented with int == 2
 					case 2 :
@@ -208,7 +202,7 @@ void clockWise(int color) {
 						break;
 					//Purple will be Represented with int == 3
 					case 3 :
-						white.topRight = copyYellow.bottomLeft;
+						white.topRight = copyYellow.topLeft;
 						white.topRightMiddle = copyYellow.bottomLeftMiddle;
 						white.top = copyYellow.bottomLeft;
 						green.bottomRight = copyWhite.topRight;
@@ -296,24 +290,24 @@ void clockWise(int color) {
 						lYellow.bottomLeftMiddle = copyGreen.topRightMiddle;
 						lYellow.topLeft = copyGreen.topRight;
 						break;
-						//Orange will be Represented with int == 8
-						case 8 :
-							grey.bottomRight = copyLBlue.topLeft;
-							grey.bottomRightMiddle = copyLBlue.bottomLeftMiddle;
-							grey.topRight = copyLBlue.bottomLeft;
-							lGreen.bottomRight = copyGrey.bottomRight;
-							lGreen.bottomRightMiddle = copyGrey.bottomRightMiddle;
-							lGreen.topRight = copyGrey.topRight;
-							yellow.top = copyLGreen.bottomRight;
-							yellow.topLeftMiddle = copyLGreen.bottomRightMiddle;
-							yellow.topLeft = copyLGreen.topRight;
-							purple.topRight = copyYellow.top;
-							purple.topRightMiddle = copyYellow.topLeftMiddle;
-							purple.top = copyYellow.topLeft;
-							lBlue.bottomLeft = copyPurple.top;
-							lBlue.bottomLeftMiddle = copyPurple.topRightMiddle;
-							lBlue.topLeft = copyPurple.topRight;
-							break;
+					//Orange will be Represented with int == 8
+					case 8 :
+						grey.bottomRight = copyLBlue.topLeft;
+						grey.bottomRightMiddle = copyLBlue.bottomLeftMiddle;
+						grey.topRight = copyLBlue.bottomLeft;
+						lGreen.bottomRight = copyGrey.bottomRight;
+						lGreen.bottomRightMiddle = copyGrey.bottomRightMiddle;
+						lGreen.topRight = copyGrey.topRight;
+						yellow.top = copyLGreen.bottomRight;
+						yellow.topLeftMiddle = copyLGreen.bottomRightMiddle;
+						yellow.topLeft = copyLGreen.topRight;
+						purple.topRight = copyYellow.top;
+						purple.topRightMiddle = copyYellow.topLeftMiddle;
+						purple.top = copyYellow.topLeft;
+						lBlue.bottomLeft = copyPurple.top;
+						lBlue.bottomLeftMiddle = copyPurple.topRightMiddle;
+						lBlue.topLeft = copyPurple.topRight;
+						break;
 					//Pink will be Represented with int == 9
 					case 9 :
 						grey.top = copyLGreen.topLeft;
@@ -350,38 +344,42 @@ void clockWise(int color) {
 						orange.bottomLeftMiddle = copyYellow.topRightMiddle;
 						orange.bottomLeft = copyYellow.top;
 						break;
-						//Light Yellow will be Represented with int == 11
-						case 11 :
-							grey.topLeft = copyPink.topLeft;
-							grey.bottomLeftMiddle = copyPink.bottomLeftMiddle;
-							grey.bottomLeft = copyPink.bottomLeft;
-							lBlue.bottomRight = copyGrey.topLeft;
-							lBlue.bottomRightMiddle = copyGrey.bottomLeftMiddle;
-							lBlue.topRight = copyGrey.bottomLeft;
-							lGreen.top = copyLBlue.bottomRight;
-							lGreen.topLeftMiddle = copyLBlue.bottomRightMiddle;
-							lGreen.topLeft = copyLBlue.topRight;
-							red.topRight = copyLGreen.top;
-							red.topRightMiddle = copyLGreen.topLeftMiddle;
-							red.top = copyLGreen.topLeft;
-							pink.topLeft = copyRed.topRight;
-							pink.bottomLeftMiddle = copyRed.topRightMiddle;
-							pink.bottomLeft = copyRed.top;
-							break;
+					//Light Yellow will be Represented with int == 11
+					case 11 :
+						grey.topLeft = copyPink.topLeft;
+						grey.bottomLeftMiddle = copyPink.bottomLeftMiddle;
+						grey.bottomLeft = copyPink.bottomLeft;
+						lBlue.bottomRight = copyGrey.topLeft;
+						lBlue.bottomRightMiddle = copyGrey.bottomLeftMiddle;
+						lBlue.topRight = copyGrey.bottomLeft;
+						lGreen.top = copyLBlue.bottomRight;
+						lGreen.topLeftMiddle = copyLBlue.bottomRightMiddle;
+						lGreen.topLeft = copyLBlue.topRight;
+						red.topRight = copyLGreen.top;
+						red.topRightMiddle = copyLGreen.topLeftMiddle;
+						red.top = copyLGreen.topLeft;
+						pink.topLeft = copyRed.topRight;
+						pink.bottomLeftMiddle = copyRed.topRightMiddle;
+						pink.bottomLeft = copyRed.top;
+						break;
 			}
 
 }
 
-//A very simple way to not reproduce code. a counter clockwise turn is the exact same as a clockwise turn 4 times.
+//A very simple way to not reproduce code.
+//A counter clockwise turn is the exact same as a clockwise turn 4 times.
+//There is no sense in doing the exact reverse of the clockwise function
 void counterClockWise(int color) {
 	for(int i = 0; i < 4; i++){
 		clockWise(color);
 	}
 }
 
-
+//For my randomizer I decided to psuedo randomly choose a face by seeding random with time, choosing a face from 0-11,
+//from the face choosing 1 of 12 directions to go, so this way there is a greater variance in my psuedo randomizer.
 void randomizer(int randomMoves)
 {
+	srand (time(NULL));
 	cout << "Welcome to the randomizer! You have " << randomMoves << " moves to make.";
 
 	for(int i = 0; i < randomMoves; i++){
@@ -458,7 +456,25 @@ void randomizer(int randomMoves)
 
 //This runs the program, starts with the base megaminx, then randomizes it, then prints it out.
 void run(){
-	//Printing the base Megaminx using the white face
+	//Storing the Solved Base Megaminx to compare to later.
+	megaminx solvedWhite = white;
+	megaminx solvedBlue = blue;
+	megaminx solvedYellow = yellow;
+	megaminx solvedPurple = purple;
+	megaminx solvedGreen = green;
+	megaminx solvedRed = red;
+	megaminx solvedGrey = grey;
+	megaminx solvedLBlue = lBlue;
+	megaminx solvedLYellow = lYellow;
+	megaminx solvedPink = pink;
+	megaminx solvedLGreen = lGreen;
+	megaminx solvedOrange = orange;
+
+
+	//Initilizing random time based on the current time
+	srand (time(NULL));
+
+	//Printing the base Megaminx
 	printSide(0);
 	printSide(1);
 	printSide(2);
@@ -472,113 +488,44 @@ void run(){
 	printSide(10);
 	printSide(11);
 
-	while (runModel == true) {
-		int randomMoves;
-
-		cout << "Please enter a number to randomize the Megaminx: ";
-		cin >> randomMoves;
-		if(cin.good()){
-			randomizer(randomMoves);
-		}
-		if(!cin.good()){
-			cin.clear();
-			cin.ignore(INT_MAX, '\n');
-			cout << "That was not a number, we will choose a number between 5 and 15 for you." << endl;
-			randomMoves = rand() % (16 - 10) + 5;
-			randomizer(randomMoves);
-		}
-
-		//Prints the entire megaminx after randomization
-		cout << "Here is the megaminx randomized" << endl;
-		printSide(0);
-		printSide(1);
-		printSide(2);
-		printSide(3);
-		printSide(4);
-		printSide(5);
-		printSide(6);
-		printSide(7);
-		printSide(8);
-		printSide(9);
-		printSide(10);
-		printSide(11);
-
-
-/*
-//Used for sanity Checking.
-int choice;
-		cout << "Do you want to move the face? 0 or 1" << endl;
-		cin >> choice;
-		if(choice == 0){
-
-		}
-		if(choice == 1)
-		{
-			megaminx colorName;
-			switch(side) {
-								//White will be Represented with int == 0
-								case 0 : colorName = white; break;
-								//Blue will be Represented with int == 1
-								case 1 : colorName = blue; break;
-								//Yellow will be Represented with int == 2
-								case 2 : colorName = yellow; break;
-								//Purple will be Represented with int == 3
-								case 3 : colorName = purple; break;
-								//Green will be Represented with int == 4
-								case 4 : colorName = green; break;
-								//Red will be Represented with int == 5
-								case 5 : colorName = red; break;
-								//Grey will be Represented with int == 6
-								case 6 : colorName = grey; break;
-								//Light Blue will be Represented with int == 7
-								case 7 : colorName = lBlue; break;
-								//Orange will be Represented with int == 8
-								case 8 : colorName = orange; break;
-								//Light Green will be Represented with int == 9
-								case 9 : colorName = lGreen; break;
-								//Pink will be Represented with int == 10
-								case 10 : colorName = pink; break;
-								//Light Yellow will be Represented with int == 11
-								case 11 : colorName = lYellow; break;
-						}
-						clockWise(colorName);
-
-		}
-		if(choice == 2)
-		{
-
-			megaminx colorName;
-			switch(side) {
-								//White will be Represented with int == 0
-								case 0 : colorName = white; break;
-								//Blue will be Represented with int == 1
-								case 1 : colorName = blue; break;
-								//Yellow will be Represented with int == 2
-								case 2 : colorName = yellow; break;
-								//Purple will be Represented with int == 3
-								case 3 : colorName = purple; break;
-								//Green will be Represented with int == 4
-								case 4 : colorName = green; break;
-								//Red will be Represented with int == 5
-								case 5 : colorName = red; break;
-								//Grey will be Represented with int == 6
-								case 6 : colorName = grey; break;
-								//Light Blue will be Represented with int == 7
-								case 7 : colorName = lBlue; break;
-								//Orange will be Represented with int == 8
-								case 8 : colorName = orange; break;
-								//Light Green will be Represented with int == 9
-								case 9 : colorName = lGreen; break;
-								//Pink will be Represented with int == 10
-								case 10 : colorName = pink; break;
-								//Light Yellow will be Represented with int == 11
-								case 11 : colorName = lYellow; break;
-						}
-						counterClockWise(colorName);
-
-		}
-		*/
+  //This is where the user will enter a numver of random moves.
+	int randomMoves;
+	cout << "Please enter a number to randomize the Megaminx: ";
+	cin >> randomMoves;
+	//If the input is good it will call the randomizer using the numver the user enterned.
+	if(cin.good()){
+		randomizer(randomMoves);
 	}
+	//If not it will choose a number between 5-15
+	if(!cin.good()){
+		cin.clear();
+		cin.ignore(INT_MAX, '\n');
+		cout << "That was not a number, we will choose a number between 5 and 15 for you." << endl;
+		randomMoves = rand() % (16 - 10) + 5;
+		randomizer(randomMoves);
+	}
+
+	//Prints the entire megaminx after randomization
+	cout << "Here is the megaminx randomized" << endl;
+	printSide(0);
+	printSide(1);
+	printSide(2);
+	printSide(3);
+	printSide(4);
+	printSide(5);
+	printSide(6);
+	printSide(7);
+	printSide(8);
+	printSide(9);
+	printSide(10);
+	printSide(11);
+
+	float outOfPlace = numberOutOfPlace(solvedWhite, solvedBlue, solvedYellow, solvedPurple, solvedGreen, solvedRed, solvedGrey, solvedLBlue, solvedLYellow, solvedPink, solvedLGreen, solvedOrange);
+
+	int heuristicValue = ceil(outOfPlace/25);
+
+	cout << endl << "Heuristic Value: " << heuristicValue << endl;
+
 }
 
 //Used for sanity Checking
@@ -587,6 +534,87 @@ int changeSide(){
 	cout << "Please choose a side to change to: ";
 	cin >> side;
 	return side;
+}
+
+int numberOutOfPlace(megaminx solvedWhite, megaminx solvedBlue, megaminx solvedYellow, megaminx solvedPurple, megaminx solvedGreen, megaminx solvedRed, megaminx solvedGrey, megaminx solvedLBlue, megaminx solvedLYellow, megaminx solvedPink, megaminx solvedLGreen, megaminx solvedOrange){
+
+	 float outOfPlace = 0.0;
+
+	 for(int i = 0; i < 12; i++){
+		 megaminx colorName;
+		 megaminx solvedColorName;
+		 switch(i) {
+	 						//White will be Represented with int == 0
+	 						case 0 : colorName = white; solvedColorName = solvedWhite; break;
+	 						//Blue will be Represented with int == 1
+	 						case 1 : colorName = blue; solvedColorName = solvedBlue; break;
+	 						//Yellow will be Represented with int == 2
+	 						case 2 : colorName = yellow; solvedColorName = solvedYellow; break;
+	 						//Purple will be Represented with int == 3
+	 						case 3 : colorName = purple; solvedColorName = solvedPurple; break;
+	 						//Green will be Represented with int == 4
+	 						case 4 : colorName = green; solvedColorName = solvedGreen; break;
+	 						//Red will be Represented with int == 5
+	 						case 5 : colorName = red; solvedColorName = solvedRed; break;
+	 						//Grey will be Represented with int == 6
+	 						case 6 : colorName = grey; solvedColorName = solvedGrey; break;
+	 						//Light Blue will be Represented with int == 7
+	 						case 7 : colorName = lBlue; solvedColorName = solvedLBlue; break;
+	 						//Orange will be Represented with int == 8
+	 						case 8 : colorName = orange; solvedColorName = solvedOrange; break;
+	 						//Light Green will be Represented with int == 9
+	 						case 9 : colorName = lGreen; solvedColorName = solvedLGreen; break;
+	 						//Pink will be Represented with int == 10
+	 						case 10 : colorName = pink; solvedColorName = solvedPink; break;
+	 						//Light Yellow will be Represented with int == 11
+	 						case 11 : colorName = lYellow; solvedColorName = solvedLYellow; break;
+	 				}
+	  	if(colorName.centerColor == solvedColorName.centerColor){
+				if(colorName.bottomMiddle != solvedColorName.bottomMiddle)
+				{
+					outOfPlace = outOfPlace + 1;
+				}
+				if(colorName.bottomLeft != solvedColorName.bottomLeft)
+				{
+					outOfPlace = outOfPlace + 1;
+				}
+				if(colorName.bottomRight != solvedColorName.bottomRight)
+				{
+					outOfPlace = outOfPlace + 1;
+				}
+				if(colorName.bottomLeftMiddle != solvedColorName.bottomLeftMiddle)
+				{
+				  outOfPlace = outOfPlace + 1;
+				}
+				if(colorName.bottomRightMiddle != solvedColorName.bottomRightMiddle)
+				{
+					outOfPlace = outOfPlace + 1;
+				}
+				if(colorName.topLeft != solvedColorName.topLeft)
+				{
+					outOfPlace = outOfPlace + 1;
+				}
+				if(colorName.topRight != solvedColorName.topRight)
+				{
+					outOfPlace = outOfPlace + 1;
+				}
+				if(colorName.topLeftMiddle != solvedColorName.topLeftMiddle)
+				{
+					outOfPlace = outOfPlace + 1;
+				}
+				if(colorName.topRightMiddle != solvedColorName.topRightMiddle)
+				{
+					outOfPlace = outOfPlace + 1;
+				}
+				if(colorName.top != solvedColorName.top)
+				{
+					outOfPlace = outOfPlace + 1;
+				}
+				cout << outOfPlace << endl;
+			}
+	 }
+	 cout << outOfPlace << endl;
+	 return outOfPlace;
 }
 
 
